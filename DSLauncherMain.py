@@ -56,11 +56,11 @@ def startfrompcl():
         print(checkVar.get())
         print(str(checkVar.get()))
         if str(checkVar.get()) == '1':
-            with open(cwd+'/DSLauncherCache/StartAll.bat','a') as f:
+            with open(cwd+'/DSLauncherStatic/StartAll.bat','a') as f:
                 f.write('@echo off\nstart /D "'+cwd+'\DSLauncherStatic" PCLLaunch.bat\nstart /D "'+cwd+'" frpc.exe')
             root.withdraw()
             try:
-                subprocess.run([cwd+'\DSLauncherCache\StartAll.bat'])
+                subprocess.run([cwd+'\DSLauncherStatic\StartAll.bat'])
             except KeyboardInterrupt:
                 root.deiconify()
         else:
