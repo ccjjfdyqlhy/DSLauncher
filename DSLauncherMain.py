@@ -1,12 +1,16 @@
 import tkinter
 from tkinter.messagebox import *
+import tkinter.messagebox
 from tkinter import *
-from tkinter import ttk
+import tkinter.ttk
 import os
+import math
 import zipfile
+import requests
 import subprocess
+import time
 
-ver='3'
+ver='4'
 cwd=os.getcwd()
 
 root=Tk()
@@ -16,18 +20,49 @@ root.resizable(False,False)
 root.iconbitmap('launchericon.ico')
 os.system('mkdir DSLauncherStatic')
 
+global url
+global inurl
+
 notebook = tkinter.ttk.Notebook(root)
 starttab = tkinter.Frame()
+downloadtab = tkinter.Frame()
 connecttab = tkinter.Frame()
-notebook.add(starttab, text='启动')
-notebook.add(connecttab, text='游戏外NatFrp联机')
+notebook.add(starttab, text='   启动   ')
+notebook.add(downloadtab,text='   下载   ')
+notebook.add(connecttab, text='   联机   ')
 notebook.pack(padx=80, pady=40, fill=tkinter.BOTH, expand=True)
 javaroute='"'+cwd+'/DSMC Pack/java/bin/javaw.exe'
+byte=1048576
 
 def downloadjava():
-    print('传输链接：https://cowtransfer.com/s/5e80d5e5390040')
+    print('传输链接：https://cowtransfer.com/s/162cfc14bf6245')
 def downloadbedrock():
     print('传输链接：https://cowtransfer.com/s/6d0c64bd05bf46')
+def show():
+    url=inurl.get()
+    getgamebutton["state"]="disabled"
+    chkbutton["state"]="disabled"
+    r = requests.get(url, stream = True)
+    with open("pack220728.exe", "wb") as Pypdf:
+        for chunk in r.iter_content(chunk_size = byte):
+            if chunk:
+                Pypdf.write(chunk)
+                file_size = os.path.getsize(cwd+r'\pack220728.exe') 
+                mbsize=file_size/1000000
+                i=math.ceil(mbsize/1642*100)
+                progressbarOne['value'] = i
+                progress.config(text=str(i)+'%')
+                root.update()
+                if i == 101:
+                    progress.config(text='校验下载资源')
+                    time.sleep(10)
+                    tkinter.messagebox.showinfo('DSLauncher','下载完成.\n转到[启动器>解编译Java包]开始安装!')
+def check():
+    url=inurl.get()
+    if url.split('/')[0] == 'https:':
+        getgamebutton["state"]="normal"
+    else:    
+        tkinter.messagebox.showinfo('DSLauncher','未知的下载地址！')
 def unpack(targetfile):
     with zipfile.ZipFile(targetfile) as zf:
         try:
@@ -36,19 +71,20 @@ def unpack(targetfile):
         except zipfile.BadZipFile:
             print('\n[ERROR]Failed when unpacking DSMCpck file')
 def decompiled():
-    showinfo('DSLauncher','请把DSMCJava.dsmcpck放到程序根目录中，然后按下确定\n警告：解压过程中请勿关闭程序！')
+    showinfo('DSLauncher','请把DSMCJava.dsmcpck放到程序根目录中(或使用[下载]菜单)，然后按下确定\n警告：解压过程中请勿关闭程序！')
     print('='*20+'UNPACKING'+'='*20)
     try:
         unpack('./DSMCJava.dsmcpck')
         showinfo('DSLauncher - 提示','解包成功！')
         os.system('del DSMCJava.dsmcpck')
     except:
-        showwarning('DSLauncher - 警告','找不到文件.')
+        showwarning('DSLauncher - 警告','找不到文件.\n点击确定开始从exe解包...')
+        os.system('"'+cwd+'/pack220728.exe"')
 def full():
     root.attributes("-fullscreen",'true')
     fullscreen.config(state=DISABLED,text='全屏模式已开启\n(点击左上角“退出”以离开)')
 def dslwelcome():
-    dw=showinfo('DSlauncher - 关于','Darkstar Minecraft Launcher v'+ver+'\n版权所有。Jeffery Darkstar, 2022')
+    dw=showinfo('DSlauncher - 关于','Darkstar Minecraft Launcher '+ver+'\n版权所有。Jeffery Darkstar, 2022')
 def startfrompcl():
     print('='*10+'准备从PCL脚本启动'+'='*10)
     try:
@@ -136,13 +172,13 @@ def startpcl():
     os.system('"'+cwd+'/PCL.exe"')
 
 menu1 = Menu(starttab, tearoff=0)
-menu1.add_command(label="下载Java安装包",command=downloadjava)
-menu1.add_command(label="下载Bedrock安装包",command=downloadbedrock)
-menu1.add_command(label="手动提前解编译Java包",command=decompiled)
-menu1.add_command(label="编辑PCL2启动脚本...（备用）",command=importsc)
-menu1.add_command(label="清除PCL启动脚本",command=clearpcl)
-menu1.add_separator()
+menu1.add_command(label="Java安装包下载地址（非直链）",command=downloadjava)
+menu1.add_command(label="Bedrock安装包下载地址（非直链）",command=downloadbedrock)
+menu1.add_command(label="解编译Java包",command=decompiled)
 menu1.add_command(label="使用BedrockPack快速启动Minecraft（Win10）",command=startbedrock)
+menu1.add_separator()
+menu1.add_command(label="编辑PCL2启动脚本...",command=importsc)
+menu1.add_command(label="清除PCL启动脚本",command=clearpcl)
 mebubar = Menu(starttab)
 mebubar.add_command(label="DSlauncher", command=dslwelcome)
 mebubar.add_cascade(label="启动器", menu=menu1)
@@ -150,7 +186,7 @@ mebubar.add_cascade(label="打开PCL2",command=startpcl)
 mebubar.add_command(label="退出", command=root.quit)
 root.config(menu=mebubar)
 
-title=Label(starttab,text='Darkstar Minecraft Launcher '+ver,font=('微软雅黑','20'))
+title=Label(starttab,text='DSLauncher '+ver,font=('微软雅黑','20'))
 title.pack(anchor='n')
 fullscreen=Button(starttab,text='全屏模式',command=full)
 fullscreen.pack(anchor='ne')
@@ -159,13 +195,31 @@ title=Label(connecttab,text='联机',font=('微软雅黑','20'))
 title.pack(anchor='n')
 warnfrp=Label(connecttab,text='注意：联机服务由NatFrp提供，不属于DSLauncher管辖！游戏内修改端口信息请转到/Plugins的frpc.ini\n在连机过程中不要关闭DSLauncher!')
 warnfrp.pack()
-startfrpbt=Button(connecttab,text='开始跨局域网联机',command=startconnect)
+startfrpbt=Button(connecttab,text='   启动内网穿透   ',command=startconnect)
 startfrpbt.pack()
 infofrp=Label(connecttab,text='使用配置文件：根目录/frpc.ini')
 infofrp.pack()
 checkVar = StringVar(value="0")
 cbutOne = tkinter.Checkbutton(root, text="游戏启动后自动开启联机",variable=checkVar)
 cbutOne.pack()
+
+title=Label(downloadtab,text='Java版整合包下载',font=('微软雅黑','20'))
+title.pack(anchor='n')
+urltext=tkinter.Label(downloadtab,text='下载链接粘贴到下方')
+urltext.pack()
+inurl=tkinter.Entry(downloadtab,width=20)
+inurl.pack()
+progressbarOne = tkinter.ttk.Progressbar(downloadtab,length=280)
+progressbarOne.pack(pady=20)
+progressbarOne['maximum'] = 100
+progressbarOne['value'] = 0
+progress=tkinter.Label(downloadtab,text='0%')
+progress.pack()
+chkbutton=tkinter.Button(downloadtab,text='检查下载地址',command=check)
+chkbutton.pack()
+getgamebutton = tkinter.Button(downloadtab, text='          获取游戏          ', command=show)
+getgamebutton["state"]="disabled"
+getgamebutton.pack(pady=5)
 
 startwarn=Label(starttab,text='使用包体内置的PCL选择PACK内Minecraft启动，再转到PCL文件夹获取启动脚本。')
 startwarn.pack()
