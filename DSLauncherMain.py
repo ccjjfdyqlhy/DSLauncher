@@ -35,7 +35,7 @@ javaroute='"'+cwd+'/DSMC Pack/java/bin/javaw.exe'
 byte=1048576
 
 def downloadjava():
-    print('传输链接：https://cowtransfer.com/s/162cfc14bf6245')
+    print('请到Github页面获取最新下载链接！\nhttps://github.com/ccjjfdyqlhy/DSLauncher/releases')
 def downloadbedrock():
     print('传输链接：https://cowtransfer.com/s/6d0c64bd05bf46')
 def show():
@@ -43,19 +43,18 @@ def show():
     getgamebutton["state"]="disabled"
     chkbutton["state"]="disabled"
     r = requests.get(url, stream = True)
-    with open("pack220728.exe", "wb") as Pypdf:
+    with open("DSMCJava.dsmcpck", "wb") as Pypdf:
         for chunk in r.iter_content(chunk_size = byte):
             if chunk:
                 Pypdf.write(chunk)
-                file_size = os.path.getsize(cwd+r'\pack220728.exe') 
+                file_size = os.path.getsize(cwd+r'\DSMCJava.dsmcpck') 
                 mbsize=file_size/1000000
-                i=math.ceil(mbsize/1642*100)
+                i=math.ceil(mbsize/1999*100)
                 progressbarOne['value'] = i
                 progress.config(text=str(i)+'%')
                 root.update()
                 if i == 101:
                     progress.config(text='校验下载资源')
-                    time.sleep(10)
                     tkinter.messagebox.showinfo('DSLauncher','下载完成.\n转到[启动器>解编译Java包]开始安装!')
 def check():
     url=inurl.get()
@@ -203,9 +202,9 @@ checkVar = StringVar(value="0")
 cbutOne = tkinter.Checkbutton(root, text="游戏启动后自动开启联机",variable=checkVar)
 cbutOne.pack()
 
-title=Label(downloadtab,text='Java版整合包下载',font=('微软雅黑','20'))
+title=Label(downloadtab,text='内部整合包下载',font=('微软雅黑','20'))
 title.pack(anchor='n')
-urltext=tkinter.Label(downloadtab,text='下载链接粘贴到下方')
+urltext=tkinter.Label(downloadtab,text='警告：此版本启动器只能下载DSMC版本220815！内部下载链接（不是公开在Github上的下载链接）粘贴到下方')
 urltext.pack()
 inurl=tkinter.Entry(downloadtab,width=20)
 inurl.pack()
